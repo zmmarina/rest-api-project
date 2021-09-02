@@ -18,7 +18,6 @@ public class ChallengeSubmission {
 	private Long id;
 	
 	@OneToOne
-	@JoinColumn(name="starter_id")
     private Starter starter;
 	
 	@ManyToOne

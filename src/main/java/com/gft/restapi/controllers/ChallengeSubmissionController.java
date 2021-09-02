@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,11 +40,13 @@ public class ChallengeSubmissionController {
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<ChallengeSubmission> listChallengeSubmissions(){
 		return challengeSubmissionRepository.findAll();
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Optional<ChallengeSubmission>> findChallengeSubmissionById(@PathVariable Long id){
 		Optional<ChallengeSubmission> foundedChallengeSubmission = challengeSubmissionRepository.findById(id);
 		return !foundedChallengeSubmission.isEmpty() ? ResponseEntity.ok(foundedChallengeSubmission) : ResponseEntity.notFound().build();
@@ -57,12 +60,14 @@ public class ChallengeSubmissionController {
 	}
 	
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<ChallengeSubmission> updateChallengeSubmission(@PathVariable Long id, @Valid @RequestBody ChallengeSubmission challengeSubmission){
 		ChallengeSubmission savedChallengeSubmission = challengeSubmissionService.updateChallengeSubmission(id, challengeSubmission);
 		return ResponseEntity.ok(savedChallengeSubmission);
 	}
 	
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteChallengeSubmission(@PathVariable Long id) {
 		challengeSubmissionRepository.deleteById(id);

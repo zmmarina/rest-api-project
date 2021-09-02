@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,17 +40,20 @@ public class ChallengeScoreController {
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<ChallengeScore> listChallengeScores(){
 		return challengeScoreRepository.findAll();
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Optional<ChallengeScore>> findChallengeScoreById(@PathVariable Long id){
 		Optional<ChallengeScore> foundedChallengeScore = challengeScoreRepository.findById(id);
 		return !foundedChallengeScore.isEmpty() ? ResponseEntity.ok(foundedChallengeScore) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<ChallengeScore> createChallengeScore(@Valid @RequestBody ChallengeScore challengeScore, HttpServletResponse response){
 		ChallengeScore savedChallengeScore = challengeScoreRepository.save(challengeScore);
 		publisher.publishEvent(new CreatedResourceEvent(this, response, savedChallengeScore.getId()));
@@ -57,12 +61,14 @@ public class ChallengeScoreController {
 	}
 	
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<ChallengeScore> updateChallengeScore(@PathVariable Long id, @Valid @RequestBody ChallengeScore challengeScore){
 		ChallengeScore savedChallengeScore = challengeScoreService.updateChallengeScore(id, challengeScore);
 		return ResponseEntity.ok(savedChallengeScore);
 	}
 	
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteChallengeScore(@PathVariable Long id) {
 		challengeScoreRepository.deleteById(id);

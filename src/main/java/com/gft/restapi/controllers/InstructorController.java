@@ -21,58 +21,57 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gft.restapi.entities.Starter;
+import com.gft.restapi.entities.Instructor;
 import com.gft.restapi.events.CreatedResourceEvent;
-import com.gft.restapi.repositories.StarterRepository;
-import com.gft.restapi.services.StarterService;
+import com.gft.restapi.repositories.InstructorRepository;
+import com.gft.restapi.services.InstructorService;
 
 @RestController
-@RequestMapping("/starter")
-public class StarterController {
+@RequestMapping("/instructor")
+public class InstructorController {
 	
 	@Autowired
-	private StarterRepository starterRepository;
+	private InstructorRepository instructorRepository;
 	
 	@Autowired
-	private StarterService starterService;
+	private InstructorService instructorService;
 	
 	@Autowired
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<Starter> listStarters(){
-		return starterRepository.findAll();
+	public List<Instructor> listInstructors(){
+		return instructorRepository.findAll();
 	}
 	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Optional<Starter>> findStarterById(@PathVariable Long id){
-		Optional<Starter> foundedStarter = starterRepository.findById(id);
-		return !foundedStarter.isEmpty() ? ResponseEntity.ok(foundedStarter) : ResponseEntity.notFound().build();
+	public ResponseEntity<Optional<Instructor>> findInstructorById(@PathVariable Long id){
+		Optional<Instructor> foundedInstructor = instructorRepository.findById(id);
+		return !foundedInstructor.isEmpty() ? ResponseEntity.ok(foundedInstructor) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Starter> createStarter(@Valid @RequestBody Starter starter, HttpServletResponse response){
-		Starter savedStarter = starterService.saveStarter(starter);
-		publisher.publishEvent(new CreatedResourceEvent(this, response, savedStarter.getId()));
-		return ResponseEntity.status(HttpStatus.CREATED).body(savedStarter);		
+	public ResponseEntity<Instructor> createInstructor(@Valid @RequestBody Instructor instructor, HttpServletResponse response){
+		Instructor savedInstructor = instructorService.saveInstructor(instructor);
+		publisher.publishEvent(new CreatedResourceEvent(this, response, savedInstructor.getId()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(savedInstructor);		
 	}
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Starter> updateStarter(@PathVariable Long id, @Valid @RequestBody Starter starter){
-		Starter savedStarter = starterService.updateStarter(id, starter);
-		return ResponseEntity.ok(savedStarter);
+	public ResponseEntity<Instructor> updateInstructor(@PathVariable Long id, @Valid @RequestBody Instructor instructor){
+		Instructor savedInstructor = instructorService.updateInstructor(id, instructor);
+		return ResponseEntity.ok(savedInstructor);
 	}
 	
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteStarter(@PathVariable Long id) {
-		starterRepository.deleteById(id);
+	public void deleteInstructor(@PathVariable Long id) {
+		instructorRepository.deleteById(id);
 	}
-	
 
 }

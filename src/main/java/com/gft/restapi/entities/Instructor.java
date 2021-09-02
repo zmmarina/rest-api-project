@@ -9,9 +9,8 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-
 @Entity
-public class Starter {
+public class Instructor {
 	
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -24,30 +23,14 @@ public class Starter {
 	@NotEmpty(message= "An email must be informed.")
 	private String email;
 	
-	@NotEmpty(message= "4 letters must be informed.")
-	@Size(min=4, max=4, message = "Only 4 letters.")
-	private String letters;
-	
 	@NotEmpty(message= "Telephone number must be informed.")
 	private String phone;
 	
 	@Embedded
 	private Address address;
 	
-	@NotEmpty(message= "A language must be informed.")
-	@Size(min=1, max=10, message = "A language must has between 1 and 10 letters.")
-	private String language;
-	
 	@OneToOne
 	private User user;
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
 
 	public Long getId() {
 		return id;
@@ -73,14 +56,6 @@ public class Starter {
 		this.email = email;
 	}
 
-	public String getLetters() {
-		return letters;
-	}
-
-	public void setLetters(String letters) {
-		this.letters = letters;
-	}
-
 	public String getPhone() {
 		return phone;
 	}
@@ -97,13 +72,12 @@ public class Starter {
 		this.address = address;
 	}
 
-	public String getLanguage() {
-		return language;
+	public User getUser() {
+		return user;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
+	public void setUser(User user) {
+		this.user = user;
 	}
-	
 
 }
