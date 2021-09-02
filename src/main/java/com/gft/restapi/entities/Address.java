@@ -12,7 +12,7 @@ public class Address {
 	private String street;
 	
 	@NotEmpty(message= "A number must be informed.")
-	@Size(min=4, max=100, message = "It must has between 4 and 100 letters.")
+	@Size(min=4, max=10, message = "It must has between 4 and 10 characters.")
 	private String number;
 	
 	@NotEmpty(message= "A city must be informed.")

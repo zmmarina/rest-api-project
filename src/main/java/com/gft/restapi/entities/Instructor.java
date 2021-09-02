@@ -1,11 +1,13 @@
 package com.gft.restapi.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
@@ -21,6 +23,8 @@ public class Instructor {
 	private String name;
 	
 	@NotEmpty(message= "An email must be informed.")
+	@Column(unique= true)
+	@Email
 	private String email;
 	
 	@NotEmpty(message= "Telephone number must be informed.")

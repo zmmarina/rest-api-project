@@ -3,14 +3,19 @@ package com.gft.restapi.entities;
 import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class User implements UserDetails{
@@ -21,7 +26,12 @@ public class User implements UserDetails{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotEmpty(message= "An email must be informed.")
+	@Column(unique= true)
+	@Email
 	private String email;
+	
+	@JsonIgnore
 	private String password;
 	
 	@OneToOne
@@ -47,6 +57,7 @@ public class User implements UserDetails{
 		this.email = email;
 	}
 	
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
