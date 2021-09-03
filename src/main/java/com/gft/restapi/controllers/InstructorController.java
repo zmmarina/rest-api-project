@@ -1,5 +1,6 @@
 package com.gft.restapi.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gft.restapi.controllers.DTO.InstructorDTO;
 import com.gft.restapi.entities.Instructor;
 import com.gft.restapi.events.CreatedResourceEvent;
 import com.gft.restapi.repositories.InstructorRepository;
@@ -41,30 +43,40 @@ public class InstructorController {
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<Instructor> listInstructors(){
-		return instructorRepository.findAll();
+	public List<InstructorDTO> listInstructors(){
+		List<InstructorDTO> instructorDTOList = new ArrayList<>();
+		List<Instructor> instructorList = instructorRepository.findAll();
+		
+		for(Instructor instructor : instructorList) {
+			InstructorDTO instructorDTO = InstructorDTO.from(instructor);
+			instructorDTOList.add(instructorDTO);
+		}
+		return instructorDTOList;
 	}
 	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Optional<Instructor>> findInstructorById(@PathVariable Long id){
+	public ResponseEntity<InstructorDTO> findInstructorById(@PathVariable Long id){
 		Optional<Instructor> foundedInstructor = instructorRepository.findById(id);
-		return !foundedInstructor.isEmpty() ? ResponseEntity.ok(foundedInstructor) : ResponseEntity.notFound().build();
+		InstructorDTO instructorDTO = InstructorDTO.from(foundedInstructor);
+		return !foundedInstructor.isEmpty() ? ResponseEntity.ok(instructorDTO) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Instructor> createInstructor(@Valid @RequestBody Instructor instructor, HttpServletResponse response){
+	public ResponseEntity<InstructorDTO> createInstructor(@Valid @RequestBody Instructor instructor, HttpServletResponse response){
 		Instructor savedInstructor = instructorService.saveInstructor(instructor);
 		publisher.publishEvent(new CreatedResourceEvent(this, response, savedInstructor.getId()));
-		return ResponseEntity.status(HttpStatus.CREATED).body(savedInstructor);		
+		InstructorDTO instructorDTO = InstructorDTO.from(savedInstructor);
+		return ResponseEntity.status(HttpStatus.CREATED).body(instructorDTO);		
 	}
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Instructor> updateInstructor(@PathVariable Long id, @Valid @RequestBody Instructor instructor){
+	public ResponseEntity<InstructorDTO> updateInstructor(@PathVariable Long id, @Valid @RequestBody Instructor instructor){
 		Instructor savedInstructor = instructorService.updateInstructor(id, instructor);
-		return ResponseEntity.ok(savedInstructor);
+		InstructorDTO instructorDTO = InstructorDTO.from(savedInstructor);
+		return ResponseEntity.ok(instructorDTO);
 	}
 	
 	@DeleteMapping("/{id}")

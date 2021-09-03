@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gft.restapi.controllers.DTO.ChallengeSubmissionDTO;
 import com.gft.restapi.entities.ChallengeSubmission;
 import com.gft.restapi.events.CreatedResourceEvent;
 import com.gft.restapi.repositories.ChallengeSubmissionRepository;
@@ -47,23 +48,26 @@ public class ChallengeSubmissionController {
 	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Optional<ChallengeSubmission>> findChallengeSubmissionById(@PathVariable Long id){
+	public ResponseEntity<ChallengeSubmissionDTO> findChallengeSubmissionById(@PathVariable Long id){
 		Optional<ChallengeSubmission> foundedChallengeSubmission = challengeSubmissionRepository.findById(id);
-		return !foundedChallengeSubmission.isEmpty() ? ResponseEntity.ok(foundedChallengeSubmission) : ResponseEntity.notFound().build();
+		ChallengeSubmissionDTO challengeSubmissionDTO = ChallengeSubmissionDTO.from(foundedChallengeSubmission);
+		return !foundedChallengeSubmission.isEmpty() ? ResponseEntity.ok(challengeSubmissionDTO) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
-	public ResponseEntity<ChallengeSubmission> createChallengeSubmission(@Valid @RequestBody ChallengeSubmission challengeSubmission, HttpServletResponse response){
+	public ResponseEntity<ChallengeSubmissionDTO> createChallengeSubmission(@Valid @RequestBody ChallengeSubmission challengeSubmission, HttpServletResponse response){
 		ChallengeSubmission savedChallengeSubmission = challengeSubmissionRepository.save(challengeSubmission);
 		publisher.publishEvent(new CreatedResourceEvent(this, response, savedChallengeSubmission.getId()));
-		return ResponseEntity.status(HttpStatus.CREATED).body(savedChallengeSubmission);
+		ChallengeSubmissionDTO challengeSubmissionDTO = ChallengeSubmissionDTO.from(savedChallengeSubmission);
+		return ResponseEntity.status(HttpStatus.CREATED).body(challengeSubmissionDTO);
 	}
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<ChallengeSubmission> updateChallengeSubmission(@PathVariable Long id, @Valid @RequestBody ChallengeSubmission challengeSubmission){
+	public ResponseEntity<ChallengeSubmissionDTO> updateChallengeSubmission(@PathVariable Long id, @Valid @RequestBody ChallengeSubmission challengeSubmission){
 		ChallengeSubmission savedChallengeSubmission = challengeSubmissionService.updateChallengeSubmission(id, challengeSubmission);
-		return ResponseEntity.ok(savedChallengeSubmission);
+		ChallengeSubmissionDTO challengeSubmissionDTO = ChallengeSubmissionDTO.from(savedChallengeSubmission);
+		return ResponseEntity.ok(challengeSubmissionDTO);
 	}
 	
 	@DeleteMapping("/{id}")

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gft.restapi.controllers.DTO.ChallengeScoreDTO;
 import com.gft.restapi.entities.ChallengeScore;
 import com.gft.restapi.events.CreatedResourceEvent;
 import com.gft.restapi.repositories.ChallengeScoreRepository;
@@ -41,30 +42,33 @@ public class ChallengeScoreController {
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<ChallengeScore> listChallengeScores(){
+	public List<ChallengeScore> listChallengeScore(){
 		return challengeScoreRepository.findAll();
 	}
 	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Optional<ChallengeScore>> findChallengeScoreById(@PathVariable Long id){
+	public ResponseEntity<ChallengeScoreDTO> findChallengeScoreById(@PathVariable Long id){
 		Optional<ChallengeScore> foundedChallengeScore = challengeScoreRepository.findById(id);
-		return !foundedChallengeScore.isEmpty() ? ResponseEntity.ok(foundedChallengeScore) : ResponseEntity.notFound().build();
+		ChallengeScoreDTO challengeScoreDTO = ChallengeScoreDTO.from(foundedChallengeScore);
+		return !foundedChallengeScore.isEmpty() ? ResponseEntity.ok(challengeScoreDTO) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<ChallengeScore> createChallengeScore(@Valid @RequestBody ChallengeScore challengeScore, HttpServletResponse response){
+	public ResponseEntity<ChallengeScoreDTO> createChallengeScore(@Valid @RequestBody ChallengeScore challengeScore, HttpServletResponse response){
 		ChallengeScore savedChallengeScore = challengeScoreRepository.save(challengeScore);
 		publisher.publishEvent(new CreatedResourceEvent(this, response, savedChallengeScore.getId()));
-		return ResponseEntity.status(HttpStatus.CREATED).body(savedChallengeScore);
+		ChallengeScoreDTO challengeScoreDTO = ChallengeScoreDTO.from(savedChallengeScore);
+		return ResponseEntity.status(HttpStatus.CREATED).body(challengeScoreDTO);
 	}
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<ChallengeScore> updateChallengeScore(@PathVariable Long id, @Valid @RequestBody ChallengeScore challengeScore){
+	public ResponseEntity<ChallengeScoreDTO> updateChallengeScore(@PathVariable Long id, @Valid @RequestBody ChallengeScore challengeScore){
 		ChallengeScore savedChallengeScore = challengeScoreService.updateChallengeScore(id, challengeScore);
-		return ResponseEntity.ok(savedChallengeScore);
+		ChallengeScoreDTO challengeScoreDTO = ChallengeScoreDTO.from(savedChallengeScore);
+		return ResponseEntity.ok(challengeScoreDTO);
 	}
 	
 	@DeleteMapping("/{id}")

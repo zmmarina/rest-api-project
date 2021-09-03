@@ -1,5 +1,6 @@
 package com.gft.restapi.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gft.restapi.controllers.DTO.StarterDTO;
 import com.gft.restapi.entities.Starter;
 import com.gft.restapi.events.CreatedResourceEvent;
 import com.gft.restapi.repositories.StarterRepository;
@@ -41,30 +43,41 @@ public class StarterController {
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<Starter> listStarters(){
-		return starterRepository.findAll();
+	public List<StarterDTO> listStarters(){
+		
+		List<StarterDTO> starterDTOList = new ArrayList<>();
+		List<Starter> starterList = starterRepository.findAll();
+		
+		for(Starter starter : starterList) {
+			StarterDTO starterDTO = StarterDTO.from(starter);
+			starterDTOList.add(starterDTO);
+		}
+		return starterDTOList;
 	}
 	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Optional<Starter>> findStarterById(@PathVariable Long id){
+	public ResponseEntity<StarterDTO> findStarterById(@PathVariable Long id){
 		Optional<Starter> foundedStarter = starterRepository.findById(id);
-		return !foundedStarter.isEmpty() ? ResponseEntity.ok(foundedStarter) : ResponseEntity.notFound().build();
+		StarterDTO starterDTO = StarterDTO.from(foundedStarter);
+		return !foundedStarter.isEmpty() ? ResponseEntity.ok(starterDTO) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Starter> createStarter(@Valid @RequestBody Starter starter, HttpServletResponse response){
+	public ResponseEntity<StarterDTO> createStarter(@Valid @RequestBody Starter starter, HttpServletResponse response){
 		Starter savedStarter = starterService.saveStarter(starter);
+		StarterDTO starterDTO = StarterDTO.from(savedStarter);
 		publisher.publishEvent(new CreatedResourceEvent(this, response, savedStarter.getId()));
-		return ResponseEntity.status(HttpStatus.CREATED).body(savedStarter);		
+		return ResponseEntity.status(HttpStatus.CREATED).body(starterDTO);		
 	}
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Starter> updateStarter(@PathVariable Long id, @Valid @RequestBody Starter starter){
+	public ResponseEntity<StarterDTO> updateStarter(@PathVariable Long id, @Valid @RequestBody Starter starter){
 		Starter savedStarter = starterService.updateStarter(id, starter);
-		return ResponseEntity.ok(savedStarter);
+		StarterDTO starterDTO = StarterDTO.from(savedStarter);
+		return ResponseEntity.ok(starterDTO);
 	}
 	
 	@DeleteMapping("/{id}")

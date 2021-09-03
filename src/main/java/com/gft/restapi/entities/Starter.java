@@ -45,6 +45,11 @@ public class Starter {
 	@OneToOne
 	private User user;
 	
+	
+	public Starter() {
+		super();
+	}
+
 	public User getUser() {
 		return user;
 	}

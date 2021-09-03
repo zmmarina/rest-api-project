@@ -1,5 +1,6 @@
 package com.gft.restapi.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gft.restapi.controllers.DTO.ChallengeDTO;
 import com.gft.restapi.entities.Challenge;
 import com.gft.restapi.events.CreatedResourceEvent;
 import com.gft.restapi.repositories.ChallengeRepository;
@@ -41,30 +43,41 @@ public class ChallengeController {
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<Challenge> listChallenges(){
-		return challengeRepository.findAll();
+	public List<ChallengeDTO> listChallenges(){
+		
+		List<ChallengeDTO> challengeDTOList = new ArrayList<>();
+		List<Challenge> challengeList = challengeRepository.findAll();
+		
+		for(Challenge challenge : challengeList) {
+			ChallengeDTO challengeDTO = ChallengeDTO.from(challenge);
+			challengeDTOList.add(challengeDTO);
+		}
+		return challengeDTOList;
 	}
 	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Optional<Challenge>> findChallengById(@PathVariable Long id){
+	public ResponseEntity<ChallengeDTO> findChallengById(@PathVariable Long id){
 		Optional<Challenge> foundedChallenge = challengeRepository.findById(id);
-		return !foundedChallenge.isEmpty() ? ResponseEntity.ok(foundedChallenge) : ResponseEntity.notFound().build();
+		ChallengeDTO challengeDTO = ChallengeDTO.from(foundedChallenge);
+		return !foundedChallenge.isEmpty() ? ResponseEntity.ok(challengeDTO) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Challenge> createChallenge (@Valid @RequestBody Challenge challenge, HttpServletResponse response){
+	public ResponseEntity<ChallengeDTO> createChallenge (@Valid @RequestBody Challenge challenge, HttpServletResponse response){
 		Challenge savedChallenge = challengeRepository.save(challenge);
 		publisher.publishEvent(new CreatedResourceEvent(this, response, savedChallenge.getId()));
-		return ResponseEntity.status(HttpStatus.CREATED).body(savedChallenge);
+		ChallengeDTO challengeDTO = ChallengeDTO.from(savedChallenge);
+		return ResponseEntity.status(HttpStatus.CREATED).body(challengeDTO);
 	}
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Challenge> updateChallenge(@PathVariable Long id, @Valid @RequestBody Challenge challenge){
+	public ResponseEntity<ChallengeDTO> updateChallenge(@PathVariable Long id, @Valid @RequestBody Challenge challenge){
 		Challenge savedChallenge = challengeService.updateChallenge(id, challenge);
-		return ResponseEntity.ok(savedChallenge);
+		ChallengeDTO challengeDTO = ChallengeDTO.from(savedChallenge);
+		return ResponseEntity.ok(challengeDTO);
 	}
 	
 	@DeleteMapping("/{id}")
