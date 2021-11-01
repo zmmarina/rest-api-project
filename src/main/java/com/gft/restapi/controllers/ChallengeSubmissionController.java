@@ -1,6 +1,6 @@
 package com.gft.restapi.controllers;
 
-import java.util.List;
+//import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -40,11 +40,26 @@ public class ChallengeSubmissionController {
 	@Autowired
 	private ApplicationEventPublisher publisher;
 	
-	@GetMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<ChallengeSubmission> listChallengeSubmissions(){
-		return challengeSubmissionRepository.findAll();
-	}
+	/*
+	 * @GetMapping
+	 * 
+	 * @PreAuthorize("hasAuthority('ADMIN')") public List<ChallengeSubmission>
+	 * listChallengeSubmissions(){ return challengeSubmissionRepository.findAll(); }
+	 */
+	
+//	@GetMapping
+//	@PreAuthorize("hasAuthority('ADMIN')")
+//	public List<ChallengeSubmissionDTO> listChallengeSubmission(){
+//		
+//		List<ChallengeSubmissionDTO> ChallengeSubmissionDTOList = new ArrayList<>();
+//		List<ChallengeSubmission> ChallengeSubmissionList = ChallengeSubmissionRepository.findAll();
+//		
+//		for(ChallengeSubmission ChallengeSubmission : ChallengeSubmission) {
+//			ChallengeSubmissionDTO ChallengeSubmissionDTO = ChallengeSubmissionDTO.from(ChallengeSubmission);
+//			ChallengeSubmissionDTOList.add(ChallengeSubmissionDTO);
+//		}
+//		return ChallengeSubmissionDTOList;
+//	}
 	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
